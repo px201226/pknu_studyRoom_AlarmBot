@@ -34,11 +34,12 @@ public class Telegram {
             in = new BufferedReader(new InputStreamReader(con.getInputStream(), "UTF-8"));
             String line;
 
-            while((line = in.readLine()) != null) { // response를 차례대로 출력
-                //System.out.println(line);
-            }
+//            while((line = in.readLine()) != null) { // response를 차례대로 출력
+//                //System.out.println(line);
+//            }
 
         } catch(Exception e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
         } finally {
             if(in != null) try { in.close(); } catch(Exception e) { e.printStackTrace(); }
