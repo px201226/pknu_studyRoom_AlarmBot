@@ -4,6 +4,8 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
+import org.telegram.telegrambots.bots.TelegramLongPollingBot;
+import org.telegram.telegrambots.meta.api.objects.Update;
 
 import java.io.IOException;
 import java.net.URI;
@@ -16,23 +18,46 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-public class Bot {
+public class Bot extends Thread {
 
-    private static final int UNDER_COUNT = 89;
-    private static final int GROUND_COUNT = 128;
+    private final int UNDER_COUNT = 89;
+    private final int GROUND_COUNT = 128;
     private final Queue<String> messageQueue = new LinkedList<>();
-    private final Telegram bot = new Telegram();
     private final MyChangeListener<Chair> myChangeListener = (chair) -> messageQueue.add(chair.toString());
     private int duration;
-    public void start(String option, int duration) {
+    private String option;
+    private Telegram telegram;
+    private boolean isRunning = false;
 
-        bot.sendMessage("<pre> 봇을 시작합니다 \n " + new Date() + "</pre>");
+    public Bot(int duration, Telegram telegram){
+        this.telegram = telegram;
+        this.duration = duration;
+    }
+
+    public void setOption(String option){
+        this.option = option;
+    }
+
+    public void setStop(){
+        isRunning = false;
+    }
+
+    public boolean getRunning(){
+        return isRunning;
+    }
+
+    @Override
+    public void run() {
+
+        int duration = this.duration;
+        telegram.sendMessage("<pre> 봇을 시작합니다 \n " + new Date() + "</pre>");
         System.out.println("봇을 시작합니다 \n " + new Date());
 
         List<Chair> observeUnderChairs = initUnderChairs(UNDER_COUNT);
         List<Chair> observeGroundCharis = initGroundChairs(GROUND_COUNT);
+        isRunning = true;
 
-        while (true) {
+        while (isRunning) {
 
             messageQueue.clear();
 
@@ -45,16 +70,16 @@ public class Bot {
             if (!messageQueue.isEmpty()) {
                 String s = toStringHTML(messageQueue);
                 System.out.println(s);
-                bot.sendMessage(s);
-                this.duration = 6000;
+                telegram.sendMessage(s);
+                duration = 6000;
             } else {
-                this.duration = duration;
+                duration = this.duration;
             }
 
             System.out.println(LocalDateTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")) + "...");
 
             try {
-                Thread.sleep(this.duration);
+                Thread.sleep(duration);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -157,4 +182,5 @@ public class Bot {
 
         return null;
     }
+
 }
