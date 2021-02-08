@@ -12,13 +12,14 @@ public class Main {
     private static int duration = 60000;
 
     public static void main(String[] args) {
-
+        Telegram telegram = new Telegram();
 
         try {
 
             TelegramBotsApi botsApi = new TelegramBotsApi(DefaultBotSession.class);
-            botsApi.registerBot(new Telegram());
+            botsApi.registerBot(telegram);
             System.out.println(nowTIme() + " 미래로 좌석 알림봇 시작");
+            telegram.sendMessage(nowTIme() + " 미래로 좌석 알림봇 시작");
         } catch (TelegramApiRequestException e) {
             e.printStackTrace();
         } catch (TelegramApiException e) {
@@ -46,6 +47,6 @@ public class Main {
     }
 
     private static String nowTIme(){
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("[yyyy-mm-dd hh:MM:ss]"));
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss]"));
     }
 }

@@ -16,19 +16,17 @@ import java.util.List;
 
 public class Telegram extends TelegramLongPollingBot {
     private final static String TOKEN = "1538322780:AAFgL2WuW5yNLquVEvdDcIW16JSEOUWAaIw";
-    //private final static String CHAT_ID = "-1001379572061";
-    private final static String CHAT_ID = "1503508262";
+    private final static String CHAT_ID = "-1001379572061";
+    //private final static String CHAT_ID = "1503508262";
     private final static int DURATION = 60000;
     private Bot bot;
 
     public void sendMessage(String message) {
-        System.out.println(message);
         try {
             execute(getSendMessage(CHAT_ID, message));
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
-
     }
 //
 //    public void sendMessage(String message) {
@@ -68,9 +66,12 @@ public class Telegram extends TelegramLongPollingBot {
     @Override
     public void onUpdateReceived(Update update) {
 
-        if (!isValidUpdate(update)) return;
+        if (!isValidUpdate(update)) {
+            sendMessage(getHelpMessage());
+            return;
+        }
 
-        System.out.println(nowTime() + " Recived Message : " + update.getMessage().getText());
+        System.out.printf("%s Recived Message : [%s] %s\n", nowTime(),getUserName(update), update.getMessage().getText());
 
         String chatId = String.valueOf(update.getMessage().getChatId());
         String message = "";
@@ -107,13 +108,8 @@ public class Telegram extends TelegramLongPollingBot {
             bot.start();
         }
 
-        try {
-            System.out.println(message);
-            execute(getSendMessage(chatId, message));
-        } catch (TelegramApiException e) {
-            e.printStackTrace();
-        }
-
+        System.out.println(message);
+        sendMessage(message);
 
         return;
 
@@ -136,7 +132,7 @@ public class Telegram extends TelegramLongPollingBot {
     }
 
     private String nowTime() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("[yyyy-mm-dd hh:MM:ss]"));
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss]"));
     }
 
     private SendMessage getSendMessage(String chatId, String msg) {
@@ -160,4 +156,12 @@ public class Telegram extends TelegramLongPollingBot {
         }
         return false;
     }
+
+    private String getHelpMessage(){
+        return "노트북실,1층,모두,중지\n 중에 하나를 입력하세요.";
+    }
+    private String getUserName(Update update){
+        return update.getMessage().getChat().getLastName() + update.getMessage().getChat().getFirstName();
+    }
+
 }
