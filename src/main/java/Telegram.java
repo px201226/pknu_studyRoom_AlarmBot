@@ -1,15 +1,9 @@
 
-import org.apache.http.client.utils.URIBuilder;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URI;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -82,8 +76,11 @@ public class Telegram extends TelegramLongPollingBot {
         }
 
         // start 명령인데 봇이 진행중이라면
-        if (!(update.getMessage().getText().equals("중지")) && bot != null && bot.getRunning()) {
+        if (isStartCommand(update.getMessage().getText()) && bot != null && bot.isRunning()) {
             message = getTextMessage("이미 작동 중 입니다.");
+            System.out.println(message);
+            sendMessage(message);
+            return;
         }
 
         if (update.getMessage().getText().equals("모두")) {
@@ -133,6 +130,13 @@ public class Telegram extends TelegramLongPollingBot {
 
     private String nowTime() {
         return LocalDateTime.now().format(DateTimeFormatter.ofPattern("[yyyy-MM-dd HH:mm:ss]"));
+    }
+
+    private boolean isStartCommand(String cmd){
+        if(cmd.equals("모두") || cmd.equals("1층") || cmd.equals("노트북실"))
+            return true;
+        else
+            return false;
     }
 
     private SendMessage getSendMessage(String chatId, String msg) {

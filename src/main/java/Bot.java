@@ -42,7 +42,7 @@ public class Bot extends Thread {
         isRunning = false;
     }
 
-    public boolean getRunning(){
+    public boolean isRunning(){
         return isRunning;
     }
 
